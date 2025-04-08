@@ -12,7 +12,7 @@ from schedcat.util.math    import lcm
 from fractions import Fraction
 
 class SporadicTask(object):
-    def __init__(self, exec_cost, period, deadline=None, id=None):
+    def __init__(self, exec_cost, period, syscall_count, deadline=None, id=None, priority=None, blocking_time=0.0):
         """By default, the construct only creates the bare minimum
         attributes. Other code (or subclasses) can add additional
         attributes (such as response time bounds, resource usage, etc.)
@@ -21,9 +21,12 @@ class SporadicTask(object):
             # implicit deadline by default
             deadline = period
         self.period     = period
-        self.cost       = exec_cost
+        self.exec_cost  = exec_cost
         self.deadline   = deadline
         self.id         = id
+        self.priority   = priority
+        self.syscall_count = syscall_count
+        self.blocking_time = blocking_time
 
     def implicit_deadline(self):
         return self.deadline == self.period
@@ -111,7 +114,8 @@ class SporadicTask(object):
     def __repr__(self):
         idstr = ", id=%s" % self.id if self.id is not None else ""
         dstr  = ", deadline=%s" % self.deadline if self.deadline != self.period else ""
-        return "SporadicTask(%s, %s%s%s)" % (self.cost, self.period, dstr, idstr)
+        pstr  = ", priority=%s" % self.priority if self.priority is not None else ""
+        return "SporadicTask(%s, %s%s%s%s)" % (self.cost, self.period, dstr, idstr, pstr)
 
 
 class TaskSystem(list):
